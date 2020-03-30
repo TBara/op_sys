@@ -1,0 +1,13 @@
+#!/bin/bash
+dims(){
+	printf "Called dims with $1\n"
+}
+
+transpose(){
+	printf "Called transpose with $1\n"
+}
+
+"$@"
+
+echo 'Done'
+
