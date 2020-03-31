@@ -1,13 +1,36 @@
 #!/bin/bash
+
+############################################################################
+# Function dims takes a files with a numbers matrix as an argument and prints 
+# the dimensions of the matrix as the number of rows, followed by a space, 
+# then the number of columns.
+############################################################################
 dims(){
-	printf "Called dims with $1\n"
+	if [ "$#" -eq 1 ] #If number of arguments is 1
+	then
+		#Get nummer of lines and display without the iflle's name
+		lineCnt=$( wc --lines $1 | cut -d' ' --fields=1 ) 
+
+		#Get the first line and count the number of words
+		colCnt=$( head --lines=1 $1 | wc -w )
+
+		#output results
+		echo "$lineCnt $colCnt"
+	else
+		#Number of supplied arguments is not 1
+		echo "Invalid number of supplied arguments"
+		exit 1
+	fi
 }
+
 
 transpose(){
 	printf "Called transpose with $1\n"
 }
 
-"$@"
+#"$@"
+$1 "${@:2}"
+echo "$1 exited with $?"
 
 echo 'Done'
 
