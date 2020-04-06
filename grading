@@ -1,0 +1,111 @@
+Checking for banned tools
+Possible use of banned tools found:
+----------
+20:# shell scripting: this means that, among others, awk, sed, tcl, bc, perl, 
+21:# & the python languages and tools are off-limits. Use of array is discouraged.
+45:# among others, awk, sed, tcl, bc, perl, & the python languages
+104:# this means that, among others, awk, sed, tcl, bc, perl, & the python languages
+174:# this means that, among others, awk, sed, tcl, bc, perl, & the python languages
+268:# this means that, among others, awk, sed, tcl, bc, perl, & the python languages
+----------
+===Rubric 1a=== Dims with 2 arguments should throw error (1pt):
++ Passed!
+===Rubric 1b=== Add with 0 arguments should throw error (1pt):
++ Passed!
+===Rubric 1c=== Multiply mismatched matrices should throw error (5pt):
++ Passed!
+===Rubric 1d=== Adding mismatched matrices should throw error (4pt):
+- stdout is non-empty
+- stderr is empty
+===Rubric 1e=== Transposing undreadable file should throw error (2pt):
+- Returned 0
+===Rubric 1f=== Dims on nonexistent file should throw error (1pt):
+- Returned 0
+- stdout is non-empty
+===Rubric 1g=== badcommand should throw error (1pt):
++ Passed!
+===Rubric 2a=== Piping m1 (5x6) into dims (3pt):
+- Returned 1
+- dimensions output is incorrect
+- stderr is non-empty
+===Rubric 2b=== Piping m2 (6x7) into dims (3pt):
+- Returned 1
+- dimensions output is incorrect
+- stderr is non-empty
+===Rubric 2c=== Piping m3 (3x8) into dims (3pt):
+- Returned 1
+- dimensions output is incorrect
+- stderr is non-empty
+===Rubric 2d=== Passing m4 (8x5) to dims on stdin (3pt):
++ Passed!
+===Rubric 2e=== Passing m1 (5x6) to dims on stdin (3pt):
++ Passed!
+===Rubric 2f=== Passing m2 (6x7) to dims on stdin (3pt):
++ Passed!
+===Rubric 3a=== Transposing hardcoded matrix (10pt):
+- Returned 2
+- Transposed matrix does not match known result
+- stderr is non-empty
+===Rubric 3b=== Transpose involution test on m3 (5pt):
+- Returned 2
+- stderr is non-empty
+- Transpose is not involutory
+===Rubric 3c=== Transpose involution test on m4 (5pt):
+- Returned 2
+- stderr is non-empty
+- Transpose is not involutory
+===Rubric 3d=== Transpose involution test on m5 w/ piping (5pt):
+- Returned 1
+- stderr is non-empty
+- Returned 1
+- Transpose is not involutory
+- stderr is non-empty
+===Rubric 4a=== Mean on hardcoded matrix (15pt):
+- Returned 2
+- Output result does not match known result
+- stderr is non-empty
+===Rubric 4b=== Mean on 5x10 zero matrix w/ piping (2pt):
+- Returned 1
+- Output result does not match known result
+- stderr is non-empty
+===Rubric 4c=== Mean on 5x10 all ones matrix (5pt):
+- Output result does not match known result
+===Rubric 4d=== Mean on 10x10 identity matrix (5pt):
+- Returned 1
+- Output result does not match known result
+===Rubric 5a=== 0 + 0 == 0? (2pt):
+- Returned 1
+- Output result does not match known result
+===Rubric 5b=== X + 0 == X? (5pt):
+- Returned 2
+- Output result does not match known result
+- stderr is non-empty
+===Rubric 5c=== 0 + X == X? (5pt):
+- Returned 2
+- Output result does not match known result
+- stderr is non-empty
+===Rubric 5d=== A + B == B + A? (1pt):
+- Returned 2
+- stderr is non-empty
+- Returned 2
+- stderr is non-empty
+===Rubric 5e=== (harcoded) A + B == C? (15pt):
+- Returned 2
+- Output result does not match known result
+- stderr is non-empty
+===Rubric 6a=== I * M == M? (5pt):
+- Returned 2
+- Output result does not match known result
+- stderr is non-empty
+===Rubric 6b=== M * I == M? (5pt):
+- Returned 2
+- Output result does not match known result
+- stderr is non-empty
+===Rubric 6c=== 0 * M == 0? (5pt):
+- Returned 2
+- Output result does not match known result
+- stderr is non-empty
+===Rubric 5d=== (hardcoded) A * B == C? (20pt):
+- Returned 2
+- Output result does not match known result
+- stderr is non-empty
