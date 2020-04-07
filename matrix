@@ -34,10 +34,10 @@ dims(){
 	fi
 
 	#Get nummer of lines and display without the iflle's name
-	lineCnt=$( wc --lines ${1:-/dev/stdin} | cut -d' ' --fields=1 )
+	lineCnt=$( wc --lines $1 | cut -d' ' --fields=1 )
 
 	#Get the first line and count the number of words
-	colCnt=$( head --lines=1 ${1:-/dev/stdin} | wc -w )
+	colCnt=$( head --lines=1 $1 | wc -w )
 
 	#output results
 	echo "$lineCnt $colCnt"
@@ -66,8 +66,8 @@ transpose(){
 	fi
 
 	#Get nummer of lines and columns in argument file
-	lineCnt=$( wc --lines ${1:-/dev/stdin} | cut -d' ' --fields=1 )
-	colCnt=$( head --lines=1 ${1:-/dev/stdin} | wc -w )
+	lineCnt=$( wc --lines $1 | cut -d' ' --fields=1 )
+	colCnt=$( head --lines=1 $1 | wc -w )
 
 	# Create one file for each column
 	x=$colCnt
@@ -92,7 +92,7 @@ transpose(){
 			printf "$i\t" >> tr_temp_$c_cnt
 			c_cnt=`expr $c_cnt + 1 `
 		done
-	done < ${1:-/dev/stdin} # Read file supplied in argument 1
+	done < $1 # Read file supplied in argument 1
 
 	# cat out temp files in ascending order
 	cntr=1

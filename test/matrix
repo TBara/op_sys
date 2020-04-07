@@ -21,26 +21,39 @@ div() {
 # & the python languages and tools are off-limits. Use of array is discouraged.
 ############################################################################
 dims(){
-	if [ "$#" -gt 1 ] #If number of arguments != 1
-	then
+	#If number of arguments != 1
+	if [ "$#" -gt 1 ]; then
 		echo "Invalid arguments." 1>&2
 		exit 1
 	fi
 
-	if [ "$#" -eq 1 ] && ! [ -f $1 ]
-	then
+	if [ "$#" -eq 1 ] && ! [ -f $1 ]; then
 		echo "Invalid files." 1>&2
 		exit 1
 	fi
 
+	# Read from supplied file or from stdin 
+    [ $# -ge 1 -a -f "$1" ] && input="$1" || input="/dev/stdin"
+    touch outp
+    printf "" > outp
+
+	# Read the input into a temp file
+    while read line; do
+		for i in $line; do
+			printf "%s\t" $i >> outp
+			c_cnt=$(($c_cnt + 1))
+		done
+        printf "\n" >> outp
+    done < "${1:-/dev/stdin}"
+
 	#Get nummer of lines and display without the iflle's name
-	lineCnt=$( wc --lines ${1:-/dev/stdin} | cut -d' ' --fields=1 )
+	lineCnt=$( wc --lines outp | cut -d' ' --fields=1 )
 
 	#Get the first line and count the number of words
-	colCnt=$( head --lines=1 ${1:-/dev/stdin} | wc -w )
+	colCnt=$( head --lines=1 outp | wc -w )
 
 	#output results
-	echo "$lineCnt $colCnt"
+	echo -e "$lineCnt\t$colCnt" > outp; cat outp #; rm -f outp
 }
 
 ############################################################################
@@ -53,26 +66,41 @@ dims(){
 ############################################################################
 transpose(){
 	trap "rm -f tr_temp_*; echo 'CTRL+C received, exiting'; exit 1; " INT HUP TERM
-	if [ "$#" -gt 1 ] #If number of arguments != 1
-	then
+	
+	#If number of arguments != 1
+	if [ "$#" -gt 1 ]; then
 		echo "Invalid arguments." 1>&2
 		exit 1
 	fi
 
-	if [ "$#" -eq 1 ] && ! [ -f $1 ]
-	then
+	if [ "$#" -eq 1 ] && ! [ -f $1 ]; then
 		echo "Invalid files." 1>&2
 		exit 1
 	fi
 
+	# Read from supplied file or from stdin 
+    [ $# -ge 1 -a -f "$1" ] && input="$1" || input="/dev/stdin"
+	
+	touch outp_tr$$
+    printf "" > outp_tr$$
+
+	# Read the input into a temp file
+    while read line; do
+		c_cnt=1
+		for i in $line; do
+			printf "%s\t" $i >> outp_tr$$
+			c_cnt=$(($c_cnt + 1))
+		done
+	        printf "\n" >> outp_tr$$
+    done < "${1:-/dev/stdin}"
+
 	#Get nummer of lines and columns in argument file
-	lineCnt=$( wc --lines ${1:-/dev/stdin} | cut -d' ' --fields=1 )
-	colCnt=$( head --lines=1 ${1:-/dev/stdin} | wc -w )
+	lineCnt=$( wc --lines outp_tr$$ | cut -d' ' --fields=1 )
+	colCnt=$( head --lines=1 outp_tr$$ | wc -w )
 
 	# Create one file for each column
 	x=$colCnt
-	while [ $x -gt 0 ];
-	do
+	while [ $x -gt 0 ]; do
 		# Create new temp file or clear previously created files
 		touch tr_temp_$x
 		printf "" > tr_temp_$x
@@ -82,28 +110,28 @@ transpose(){
 	# Store numbers in temp file in single row
 	# Each column in argument file is transposed
 	# into a row in temp file
-	while read line
-	do
+	while read line; do
 		#track column count
 		c_cnt=1
-		for i in $line
-		do
+		for i in $line; do
 			# Write the number into a file
-			printf "$i\t" >> tr_temp_$c_cnt
+			printf "%s\t" $i >> tr_temp_$c_cnt
 			c_cnt=`expr $c_cnt + 1 `
 		done
-	done < ${1:-/dev/stdin} # Read file supplied in argument 1
+	done < outp_tr$$ # Read file supplied in argument 1
 
 	# cat out temp files in ascending order
 	cntr=1
-	while [  $cntr -le $colCnt ]
-	do
-		cat tr_temp_$cntr
-		printf "\n"
-		#echo $( cat tr_temp_$cntr )
+	
+	printf "" > outp_tr$$
+	while [ $cntr -le $colCnt ]; do
+		cat tr_temp_$cntr >> outp_tr$$
+		truncate -s-1 outp_tr$$
+		printf "\n" >> outp_tr$$
 		let cntr=cntr+1
 	done
-
+	cat -e -A outp_tr$$
+	#cat outp_tr$$
 	#remov temp files
 	find . -maxdepth 1 -name "tr_temp_*" -exec rm -f {} \;
 }
@@ -371,7 +399,32 @@ multiply(){
 	find . -maxdepth 1 -name 'p_tmp.*' -exec rm -f {} \;
 }
 
-$1 "${@:2}"
+
+function generate(){
+	y=0
+	a=$3
+	b=$4
+	while [ "$y" -lt "$1" ]
+	do
+		x=0
+		((y++))
+		while [ "$x" -lt "$2" ]
+		do
+			((x++))
+			echo -n $((RANDOM%(b-a+1)+a))
+			if [ "$x" -ne "$2" ]
+			then
+			echo -ne "\t"
+			else
+				echo
+			fi
+		done
+	done
+}
+
+generate 5 6 -10 10 > f_tst
+
+#$1 "${@:2}"
 #echo -e "\n$1 exit with $?"
 
 

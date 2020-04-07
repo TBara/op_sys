@@ -1,12 +1,12 @@
 Checking for banned tools
 Possible use of banned tools found:
 ----------
-20:# shell scripting: this means that, among others, awk, sed, tcl, bc, perl, 
-21:# & the python languages and tools are off-limits. Use of array is discouraged.
-45:# among others, awk, sed, tcl, bc, perl, & the python languages
-104:# this means that, among others, awk, sed, tcl, bc, perl, & the python languages
-174:# this means that, among others, awk, sed, tcl, bc, perl, & the python languages
-268:# this means that, among others, awk, sed, tcl, bc, perl, & the python languages
+42:# shell scripting: this means that, among others, awk, sed, tcl, bc, perl, 
+43:# & the python languages and tools are off-limits. Use of array is discouraged.
+86:# among others, awk, sed, tcl, bc, perl, & the python languages
+166:# this means that, among others, awk, sed, tcl, bc, perl, & the python languages
+236:# this means that, among others, awk, sed, tcl, bc, perl, & the python languages
+330:# this means that, among others, awk, sed, tcl, bc, perl, & the python languages
 ----------
 ===Rubric 1a=== Dims with 2 arguments should throw error (1pt):
 + Passed!
@@ -15,51 +15,33 @@ Possible use of banned tools found:
 ===Rubric 1c=== Multiply mismatched matrices should throw error (5pt):
 + Passed!
 ===Rubric 1d=== Adding mismatched matrices should throw error (4pt):
-- stdout is non-empty
-- stderr is empty
++ Passed!
 ===Rubric 1e=== Transposing undreadable file should throw error (2pt):
 - Returned 0
 ===Rubric 1f=== Dims on nonexistent file should throw error (1pt):
-- Returned 0
-- stdout is non-empty
++ Passed!
 ===Rubric 1g=== badcommand should throw error (1pt):
 + Passed!
 ===Rubric 2a=== Piping m1 (5x6) into dims (3pt):
-- Returned 1
 - dimensions output is incorrect
-- stderr is non-empty
 ===Rubric 2b=== Piping m2 (6x7) into dims (3pt):
-- Returned 1
 - dimensions output is incorrect
-- stderr is non-empty
 ===Rubric 2c=== Piping m3 (3x8) into dims (3pt):
-- Returned 1
 - dimensions output is incorrect
-- stderr is non-empty
 ===Rubric 2d=== Passing m4 (8x5) to dims on stdin (3pt):
-+ Passed!
+- dimensions output is incorrect
 ===Rubric 2e=== Passing m1 (5x6) to dims on stdin (3pt):
-+ Passed!
+- dimensions output is incorrect
 ===Rubric 2f=== Passing m2 (6x7) to dims on stdin (3pt):
-+ Passed!
+- dimensions output is incorrect
 ===Rubric 3a=== Transposing hardcoded matrix (10pt):
-- Returned 2
 - Transposed matrix does not match known result
-- stderr is non-empty
 ===Rubric 3b=== Transpose involution test on m3 (5pt):
-- Returned 2
-- stderr is non-empty
 - Transpose is not involutory
 ===Rubric 3c=== Transpose involution test on m4 (5pt):
-- Returned 2
-- stderr is non-empty
 - Transpose is not involutory
 ===Rubric 3d=== Transpose involution test on m5 w/ piping (5pt):
-- Returned 1
-- stderr is non-empty
-- Returned 1
 - Transpose is not involutory
-- stderr is non-empty
 ===Rubric 4a=== Mean on hardcoded matrix (15pt):
 - Returned 2
 - Output result does not match known result

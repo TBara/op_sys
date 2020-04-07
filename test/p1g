@@ -344,9 +344,12 @@ result=0
 
 # Populate matrix files
 generate 5 6 -10 10 >"$m1"
+cat $m1 > f5x6
 generate 6 7 -10 10 >"$m2"
+cat $m2 > f6x7
 generate 3 8 -10 10 >"$m3"
 generate 8 5 -10 10 >"$m4"
+cat $m4 > f8x5
 generate 3 8 -10 10 >"$m5"
 
 if [ $(( runFlag & ERR )) -eq 0 ]
