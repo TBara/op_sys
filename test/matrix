@@ -422,9 +422,9 @@ function generate(){
 	done
 }
 
-generate 5 6 -10 10 > f_tst
+#generate 5 6 -10 10 > f_tst
 
-#$1 "${@:2}"
+$1 "${@:2}"
 #echo -e "\n$1 exit with $?"
 
 
