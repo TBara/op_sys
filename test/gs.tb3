@@ -1,20 +1,14 @@
 Checking for banned tools
-Possible use of banned tools found:
-----------
-22:# shell scripting: this means that, among others, awk, sed, tcl, bc, perl, 
-23:# & the python languages and tools are off-limits. Use of array is discouraged.
-41:# among others, awk, sed, tcl, bc, perl, & the python languages
-106:# this means that, among others, awk, sed, tcl, bc, perl, & the python languages
-----------
+None of the listed banned tools found
 ===Rubric 1a=== Dims with 2 arguments should throw error (1pt):
 + Passed!
 ===Rubric 1b=== Add with 0 arguments should throw error (1pt):
-+ Passed!
+- stdout is non-empty
 ===Rubric 1c=== Multiply mismatched matrices should throw error (5pt):
 - Returned 0
 - stderr is empty
 ===Rubric 1d=== Adding mismatched matrices should throw error (4pt):
-+ Passed!
+- stdout is non-empty
 ===Rubric 1e=== Transposing undreadable file should throw error (2pt):
 + Passed!
 ===Rubric 1f=== Dims on nonexistent file should throw error (1pt):
@@ -43,17 +37,12 @@ Possible use of banned tools found:
 ===Rubric 3d=== Transpose involution test on m5 w/ piping (5pt):
 + Passed!
 ===Rubric 4a=== Mean on hardcoded matrix (15pt):
-- Returned 2
 - Output result does not match known result
-- stderr is non-empty
 ===Rubric 4b=== Mean on 5x10 zero matrix w/ piping (2pt):
-- Returned 1
 - Output result does not match known result
 ===Rubric 4c=== Mean on 5x10 all ones matrix (5pt):
 - Output result does not match known result
-- stderr is non-empty
 ===Rubric 4d=== Mean on 10x10 identity matrix (5pt):
-- Returned 1
 - Output result does not match known result
 ===Rubric 5a=== 0 + 0 == 0? (2pt):
 - Returned 1
