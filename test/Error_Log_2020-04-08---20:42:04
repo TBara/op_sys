@@ -1,71 +1,93 @@
-Checking for banned tools
-Possible use of banned tools found:
-----------
-12:# shell scripting: this means that, among others, awk, sed, tcl, bc, perl, 
-13:# & the python languages and tools are off-limits. Use of array is discouraged.
-31:# among others, awk, sed, tcl, bc, perl, & the python languages
-97:# this means that, among others, awk, sed, tcl, bc, perl, & the python languages
-172:# this means that, among others, awk, sed, tcl, bc, perl, & the python languages
-----------
 ===Rubric 1a=== Dims with 2 arguments should throw error (1pt):
-+ Passed!
 ===Rubric 1b=== Add with 0 arguments should throw error (1pt):
-- Hung process (killed)
 ===Rubric 1c=== Multiply mismatched matrices should throw error (5pt):
 - Returned 0
 - stderr is empty
 ===Rubric 1d=== Adding mismatched matrices should throw error (4pt):
-+ Passed!
 ===Rubric 1e=== Transposing undreadable file should throw error (2pt):
-+ Passed!
 ===Rubric 1f=== Dims on nonexistent file should throw error (1pt):
-+ Passed!
 ===Rubric 1g=== badcommand should throw error (1pt):
 - Returned 0
 - stderr is empty
 ===Rubric 2a=== Piping m1 (5x6) into dims (3pt):
-+ Passed!
 ===Rubric 2b=== Piping m2 (6x7) into dims (3pt):
-+ Passed!
 ===Rubric 2c=== Piping m3 (3x8) into dims (3pt):
-+ Passed!
 ===Rubric 2d=== Passing m4 (8x5) to dims on stdin (3pt):
-+ Passed!
 ===Rubric 2e=== Passing m1 (5x6) to dims on stdin (3pt):
-+ Passed!
 ===Rubric 2f=== Passing m2 (6x7) to dims on stdin (3pt):
-+ Passed!
 ===Rubric 3a=== Transposing hardcoded matrix (10pt):
-+ Passed!
 ===Rubric 3b=== Transpose involution test on m3 (5pt):
-+ Passed!
 ===Rubric 3c=== Transpose involution test on m4 (5pt):
-+ Passed!
 ===Rubric 3d=== Transpose involution test on m5 w/ piping (5pt):
-+ Passed!
 ===Rubric 4a=== Mean on hardcoded matrix (15pt):
-- Output result does not match known result
+- Output result does not match known result. Your output was
+ ./matrix mean matrix.VYyVO
+-10^I16^I13^I4^I2^I-4$
+First matrix stored in m21.1
 ===Rubric 4b=== Mean on 5x10 zero matrix w/ piping (2pt):
 - Output result does not match known result
+0^I0^I0^I0^I0^I0^I0^I0^I0^I0$
+First matrix stored in m22.1
 ===Rubric 4c=== Mean on 5x10 all ones matrix (5pt):
 - Output result does not match known result
+1^I1^I1^I1^I1^I1^I1^I1^I1^I1$
+First matrix stored in m23.1
 ===Rubric 4d=== Mean on 10x10 identity matrix (5pt):
 - Output result does not match known result
+0^I0^I0^I0^I0^I0^I0^I0^I0^I0$
+First matrix stored in m24.1
 ===Rubric 5a=== 0 + 0 == 0? (2pt):
-+ Passed!
+- Returned 1
+- Output result does not match known result
+- stderr is non-empty
+Invalid number of arguments
+First matrix stored in m25.1
+Second matrix stored in m25.2
 ===Rubric 5b=== X + 0 == X? (5pt):
-+ Passed!
+- Returned 1
+- Output result does not match known result
+- stderr is non-empty
+Invalid number of arguments
+First matrix stored in m26.1
+Second matrix stored in m26.2
 ===Rubric 5c=== 0 + X == X? (5pt):
-+ Passed!
+- Returned 1
+- Output result does not match known result
+- stderr is non-empty
+Invalid number of arguments
+First matrix stored in m27.1
+Second matrix stored in m27.2
 ===Rubric 5d=== A + B == B + A? (1pt):
-+ Passed!
+- Returned 1
+- stderr is non-empty
+Invalid number of arguments
+First matrix stored in m28.1
+Second matrix stored in m28.2
+- Returned 1
+- stderr is non-empty
+Invalid number of arguments
+First matrix stored in m29.1
+Second matrix stored in m29.2
 ===Rubric 5e=== (harcoded) A + B == C? (15pt):
-+ Passed!
+- Returned 1
+- Output result does not match known result
+- stderr is non-empty
+Invalid number of arguments
+First matrix stored in m30.1
+Second matrix stored in m30.2
 ===Rubric 6a=== I * M == M? (5pt):
 - Output result does not match known result
+First matrix stored in m31.1
+Second matrix stored in m31.2
 ===Rubric 6b=== M * I == M? (5pt):
 - Output result does not match known result
+First matrix stored in m32.1
+Second matrix stored in m32.2
 ===Rubric 6c=== 0 * M == 0? (5pt):
 - Output result does not match known result
+First matrix stored in m33.1
+Second matrix stored in m33.2
 ===Rubric 5d=== (hardcoded) A * B == C? (20pt):
 - Output result does not match known result
+First matrix stored in m34.1
+Second matrix stored in m34.2
