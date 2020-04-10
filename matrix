@@ -1,18 +1,5 @@
 #!/bin/bash -e
 
-# This is a helper function to output floating point/decimal division
-# It takes two integers as arguments and divides them to return the decimal value
-# Full credit to user bebbo in:
-# https://stackoverflow.com/questions/12722095/how-do-i-use-floating-point-division-in-bash
-div() {
-  local _d=${3:-2}
-  local _n=00000000
-  _n=${_n:0:$_d}
-  local _r=$(($1$_n/$2))
-  _r=${_r:0:-$_d}.${_r: -$_d}
-  echo $_r
-}
-
 ############################################################################
 # Function dims takes a file with a numbers matrix as an argument and prints
 # the dimensions of the matrix as the number of rows, followed by a space,
@@ -21,26 +8,14 @@ div() {
 # & the python languages and tools are off-limits. Use of array is discouraged.
 ############################################################################
 dims(){
-	if [ "$#" -gt 1 ] #If number of arguments != 1
-	then
-		echo "Invalid arguments." 1>&2
-		exit 1
-	fi
-
-	if [ "$#" -eq 1 ] && ! [ -f $1 ]
-	then
-		echo "Invalid files." 1>&2
-		exit 1
-	fi
-
-	#Get nummer of lines and display without the iflle's name
-	lineCnt=$( wc --lines $1 | cut -d' ' --fields=1 )
+  lineCnt=0
+  while read myLine; do
+    lineCnt=$(($lineCnt + 1))
+  done < $1
 
 	#Get the first line and count the number of words
 	colCnt=$( head --lines=1 $1 | wc -w )
-
-	#output results
-	echo "$lineCnt $colCnt"
+  echo -e "$lineCnt $colCnt"
 }
 
 ############################################################################
@@ -53,26 +28,27 @@ dims(){
 ############################################################################
 transpose(){
 	trap "rm -f tr_temp_*; echo 'CTRL+C received, exiting'; exit 1; " INT HUP TERM
-	if [ "$#" -gt 1 ] #If number of arguments != 1
-	then
-		echo "Invalid arguments." 1>&2
-		exit 1
-	fi
+	
+	touch outp_tr$$
+  printf "" > outp_tr$$
 
-	if [ "$#" -eq 1 ] && ! [ -f $1 ]
-	then
-		echo "Invalid files." 1>&2
-		exit 1
-	fi
+	# Read the input into a temp file
+    while read line; do
+		c_cnt=1
+		for i in $line; do
+			printf "%s\t" $i >> outp_tr$$
+			c_cnt=$(($c_cnt + 1))
+		done
+	        printf "\n" >> outp_tr$$
+    done < $1
 
 	#Get nummer of lines and columns in argument file
-	lineCnt=$( wc --lines $1 | cut -d' ' --fields=1 )
-	colCnt=$( head --lines=1 $1 | wc -w )
+	lineCnt=$( wc --lines outp_tr$$ | cut -d' ' --fields=1 )
+	colCnt=$( head --lines=1 outp_tr$$ | wc -w )
 
 	# Create one file for each column
 	x=$colCnt
-	while [ $x -gt 0 ];
-	do
+	while [ $x -gt 0 ]; do
 		# Create new temp file or clear previously created files
 		touch tr_temp_$x
 		printf "" > tr_temp_$x
@@ -82,30 +58,30 @@ transpose(){
 	# Store numbers in temp file in single row
 	# Each column in argument file is transposed
 	# into a row in temp file
-	while read line
-	do
+	while read line; do
 		#track column count
 		c_cnt=1
-		for i in $line
-		do
+		for i in $line; do
 			# Write the number into a file
-			printf "$i\t" >> tr_temp_$c_cnt
+			printf "%s\t" $i >> tr_temp_$c_cnt
 			c_cnt=`expr $c_cnt + 1 `
 		done
-	done < $1 # Read file supplied in argument 1
+	done < outp_tr$$ # Read file supplied in argument 1
 
 	# cat out temp files in ascending order
 	cntr=1
-	while [  $cntr -le $colCnt ]
-	do
-		cat tr_temp_$cntr
-		printf "\n"
-		#echo $( cat tr_temp_$cntr )
+	printf "" > outp_tr$$
+	while [ $cntr -le $colCnt ]; do
+		cat tr_temp_$cntr >> outp_tr$$
+		truncate -s-1 outp_tr$$
+		printf "\n" >> outp_tr$$
 		let cntr=cntr+1
 	done
-
+	#cat -e -A outp_tr$$
+	cat outp_tr$$
 	#remov temp files
 	find . -maxdepth 1 -name "tr_temp_*" -exec rm -f {} \;
+	find . -maxdepth 1 -name "outp_tr*" -exec rm -f {} \;
 }
 
 ############################################################################
@@ -117,16 +93,13 @@ transpose(){
 ############################################################################
 mean () {
 	trap "rm -f mean_temp.*; echo 'CTRL+C received, exiting'; exit 1; " INT HUP TERM
-	if [ "$#" != 1 ] #If number of arguments != 1
-	then
-		echo "Invalid number of supplied arguments" 1>&2
-		exit 1
-	fi
 
 	#Get nummer of lines and columns in argument file
-	lineCnt=$( wc --lines $1 | cut -d' ' --fields=1 )
+	lineCnt=0
+	while read myLine; do
+		lineCnt=$(($lineCnt + 1))
+	done < $1
 	colCnt=$( head --lines=1 $1 | wc -w )
-	pid=$$
 
 	# Create one file for each column
 	x=$colCnt
@@ -148,16 +121,18 @@ mean () {
 		for i in $line
 		do
 			# Write the number into a file
-			printf "$i " >> mean_temp.$c_cnt
+			printf "%s " $i >> mean_temp.$c_cnt
 			c_cnt=$(expr $c_cnt + 1 )
 		done
 	done < $1 # Read file supplied in argument 1
 
 	# Calculate the mean and store it in a temp file
 	cnt=1
-	touch mean_temp.o # Create temp file
+	touch mean_temp$$ # Create temp file
+	
 	while [ $cnt -le $colCnt ]
 	do
+		truncate -s-1 mean_temp.$cnt
 		printf "\n" >> mean_temp.$cnt
 		while read line
 		do
@@ -165,16 +140,22 @@ mean () {
 			sum=0
 			for i in $line
 			do
-				sum=$( expr $sum + $i )
+				sum=$(($sum + $i ))
 			done
+			#printf "sum: $sum\t"
 		done < mean_temp.$cnt
+		
 		# Calculate mean and output to temp file
-		printf "$( div $sum $lineCnt ) " >> mean_temp.o
+		decim=$(( ($sum + ($lineCnt/2)*(($sum > 0)*2-1))/$lineCnt ))
+		printf "%s\t" $decim >> mean_temp$$
 		cnt=$(expr $cnt + 1 )
 	done
-
+	
+	truncate -s-1 mean_temp$$
+	printf "\n" >> mean_temp$$
+	#printf "\n"
 	#Output results and remove temp files
-	cat mean_temp.o
+	cat mean_temp$$
 	find . -maxdepth 1 -name 'mean_temp*' -exec rm -f {} \;
 }
 
@@ -187,21 +168,20 @@ mean () {
 ####################################################################################
 add(){
 	trap "rm -f add_temp.*; echo 'CTRL+C received, exiting'; exit 1; " INT HUP TERM
-	if [ "$#" != 2 ]
-	then
-		#Number of supplied arguments is not 2
-		echo "Invalid number of supplied arguments" 1>&2
-		exit 1
-	fi
-
 	find . -maxdepth 1 -name 'add_temp.*' -exec rm -f {} \;
 
-	#Get nummer of lines
-	lineCnt1=$( wc --lines $1 | cut -d' ' --fields=1 )
-	lineCnt2=$( wc --lines $2 | cut -d' ' --fields=1 )
-
-	#Get the first line and count the number of words
+	#Get nummer of lines and columns in first argument file
+	lineCnt1=0
+	while read myLine; do
+		lineCnt1=$(($lineCnt1 + 1))
+	done < $1
 	colCnt1=$( head --lines=1 $1 | wc -w )
+
+	#Get nummer of lines and columns in second argument file
+	lineCnt2=0
+	while read myLine; do
+		lineCnt2=$(($lineCnt2 + 1))
+	done < $2
 	colCnt2=$( head --lines=1 $2 | wc -w )
 	coldbl=$(($colCnt1 * 2))
 
@@ -220,8 +200,8 @@ add(){
 		for i in $line
 		do
 			# Write the number into a file
-			printf "$i " >> add_temp.$f_cnt
-			f_cnt=$(expr $f_cnt + 1 )
+			printf "%s " $i >> add_temp.$f_cnt
+			f_cnt=$(($f_cnt + 1))
 		done
 	done < $1 # Read file supplied in argument 1
 
@@ -230,8 +210,8 @@ add(){
 		for i in $line
 		do
 			# Write the number into a file
-			printf "$i " >> add_temp.$f_cnt
-			f_cnt=$(expr $f_cnt + 1 )
+			printf "%s " $i >> add_temp.$f_cnt
+			f_cnt=$(($f_cnt + 1))
 		done
 	done < $2 # Read file supplied in argument 2
 
@@ -241,30 +221,44 @@ add(){
 	matrix_cnt=$(( $f_cnt / 2 ))
 	touch add_temp.o
 	printf "" > add_temp.o
+	
 	while [ $cnt -le $matrix_cnt ]
 	do
-		#printf "last!\n"
-		cnt2=$( expr $cnt + $matrix_cnt )
+		cnt2=$(($cnt + $matrix_cnt))
 
 		# Sum the numbers. Take number from current file
 		# and add it with the number from (current file + numer of entries in matrix)
 		sum=0
-		num1=$( head -c1 add_temp.$cnt )
-		sum=$( expr $sum + $num1 )
+		truncate -s-1 add_temp.$cnt
+		printf "\n" >> add_temp.$cnt
+		while read line
+		do
+			for i in $line
+			do
+				sum=$(($sum + $i ))
+			done
+		done < add_temp.$cnt
 
-		num2=$( head -c1 add_temp.$cnt2 )
-		sum=$( expr $sum + $num2 )
+		truncate -s-1 add_temp.$cnt2
+		printf "\n" >> add_temp.$cnt2
+		while read line
+		do
+			for i in $line
+			do
+				sum=$(($sum + $i ))
+			done
+		done < add_temp.$cnt2
 
 		# Form summed matrix
 		if (( $cnt % $colCnt1 != 0 ))
 		then
 			# delimitate with tab
-			printf "$sum\t" >> add_temp.o
+			printf "%s\t" $sum >> add_temp.o
 		else
 			# delimitate with new line
-			printf "$sum\n" >> add_temp.o
+			printf "%s\n" $sum >> add_temp.o
 		fi
-		cnt=$(expr $cnt + 1 )
+		cnt=$(($cnt + 1))
 	done
 
 	# Output results and remove temp files
@@ -281,97 +275,143 @@ add(){
 ########################################################################################
 multiply(){
 	trap "rm -f p_tmp.*; echo 'CTRL+C received, exiting'; exit 1; " INT HUP TERM
-	if [ "$#" != 2 ]
-	then
-		#Number of supplied arguments is not 2
-		echo "Invalid number of supplied arguments" 1>&2
-		exit 1
-	fi
 
-	#Get nummer of rows and columns in each matrix
-	lineCnt1=$( wc --lines $1 | cut -d' ' --fields=1 )
-	lineCnt2=$( wc --lines $2 | cut -d' ' --fields=1 )
+	#Get nummer of lines and columns in first argument file
+	lineCnt1=0
+	while read myLine; do
+		lineCnt1=$(($lineCnt1 + 1))
+	done < $1
 	colCnt1=$( head --lines=1 $1 | wc -w )
+	
+	#Get nummer of lines and columns in second argument file
+	lineCnt2=0
+	while read myLine; do
+		lineCnt2=$(($lineCnt2 + 1))
+	done < $2
 	colCnt2=$( head --lines=1 $2 | wc -w )
-
-	if [ $colCnt1 != $lineCnt2 ]
-	then
+	
+	if [ $colCnt1 != $lineCnt2 ]; then
 		#Number of supplied arguments is not 2
-		echo "Mtrices cannot be multiplied" 1>&2
+		echo "Matrices' are not compatible" 1>&2
 		exit 1
 	fi
 
 	# Store numbers in seperate temp files. Track file count
 	l=1
-	while read line
-	do
+	while read line; do
 		f=1
-		for i in $line
-		do
+		for i in $line; do
 			# Write the number into a file. Name the file with col and row index
 			printf "" > p_tmp.1.$l.$f
-			printf "$i\n" >> p_tmp.1.$l.$f
-			f=$(expr $f + 1)
+			printf "%s\n" $i >> p_tmp.1.$l.$f
+			f=$(($f + 1))
 		done
-		l=$(expr $l + 1)
+		l=$(($l + 1))
 	done < $1 # Read file supplied in argument 1
 
 	l=1
-	while read line
-	do
+	while read line; do
 		f=1
-		for i in $line
-		do
+		for i in $line; do
 			# Write the number into a file. Name the file with col and row index
 			printf "" > p_tmp.2.$l.$f
-			printf "$i " >> p_tmp.2.$l.$f
-			f=$(expr $f + 1)
+			printf "%s " $i >> p_tmp.2.$l.$f
+			f=$(($f + 1))
 		done
-		l=$(expr $l + 1)
+		l=$(($l + 1))
 	done < $2 # Read file supplied in argument 2
-
+	
+	touch p_tmp.o
 	printf "" > p_tmp.o # output file
 	cntr=1
-	m1rows=1
-	while [ $m1rows -le $lineCnt1 ] # Iterate each row in m1
-	do
-		m2cols=1
-		while [ $m2cols -le $colCnt2 ] # Iterate each column in m2
-		do
-			m2rows=1
+	
+	m1row=1
+	while [ $m1row -le $lineCnt1 ]; do
+		
+		m2col=1
+		while [ $m2col -le $colCnt2 ] ;do
+			
 			sum=0
-			
-			while [ $m2rows -le $lineCnt2 ] # Iterate each row in m2
-			do
+			m1col=1
+			while [ $m1col -le $colCnt1 ] ;do
+
 				# Multiply m1 file and m2 file then add result to running sum
-				n1=$( head -c1 p_tmp.1.$m2cols.$m2rows )
-				n2=$( head -c1 p_tmp.2.$m2rows.$m1rows )
-				sum=$(($sum + $n1 * $n2))
-				
-				m2rows=$(($m2rows + 1))
+				# Get number from m1
+				truncate -s-1 p_tmp.1.$m1row.$m1col
+				printf "\n" >> p_tmp.1.$m1row.$m1col
+				n1=0
+				while read line; do
+					for i in $line; do
+						n1=$i
+					done
+				done < p_tmp.1.$m1row.$m1col
+
+				# Get number from m2
+				truncate -s-1 p_tmp.2.$m1col.$m2col
+				printf "\n" >> p_tmp.2.$m1col.$m2col
+				n2=0
+				while read line; do
+					for i in $line; do
+						n2=$i
+					done
+				done < p_tmp.2.$m1col.$m2col
+				sum=$(($sum + ($n1 * $n2)))
+				m1col=$(($m1col + 1))
 			done
-			#printf "$sum\t" >> p.tmp_o # Write each product sum
-			
-			if [ $cntr == $colCnt2 ]
-			then
-				printf "$sum\n" >> p_tmp.o # Write each product sum
-				cntr=1
-			else
-				printf "$sum\t" >> p_tmp.o # Write each product sum
-				cntr=$(($cntr+1))
-			fi
-
-			m2cols=$(($m2cols + 1))
+			printf "%s\t" $sum >> p_tmp.o # Write each product-sum
+			m2col=$(($m2col + 1))
 		done
-		m1rows=$(($m1rows + 1))
+		truncate -s-1 p_tmp.o
+		printf "\n" >> p_tmp.o
+		m1row=$(($m1row + 1))
 	done
-	transpose p_tmp.o
-
+	cat p_tmp.o
 	# Output results and remove temp files
 	find . -maxdepth 1 -name 'p_tmp.*' -exec rm -f {} \;
 }
 
-$1 "${@:2}"
-#echo -e "\n$1 exit with $?"
+if [[ $# > 3 ]]; then echo "Too many arguments passed" 1>&2; exit 1; fi
 
+# Condition prechecks for dims and mean functions
+if [ $1 = "mean" ] || [ $1 = "dims" ] ; then
+	func=$1
+	if [ ! -f $2 ] ; then echo "Invalid file" 1>&2; exit 1; fi
+	if [[ $# > 2 ]] ; then echo "Too many arguments passed" 1>&2; exit 1; fi
+	if [[ $# > 1 ]] ; then file1=$2; file2=$3; fi
+	if [[ $# == 1 ]] ; then file1=temp; cat > $file1; fi
+	$func $file1
+fi
 
+# Condition prechecks for transpose
+if [ $1 = "transpose" ]; then
+	if [[ $# > 2 ]]; then echo "Invalid number of arguments" 1>&2; exit 1;
+	elif [ $# -gt 1 ]; then file1=$2; file2=$3
+	elif [ $# -eq 1 ]; then file1=temp; cat > $file1; fi
+	if [ ! -r $2 ]; then echo "Invalid file" 1>&2; exit 1; fi
+	transpose $file1
+fi
+
+# Condition prechecks for add
+if [ $1 = "add" ]; then 
+	if [[ $# == 1 ]]; then echo "No arguments will be passed to add" 1>&2; exit 1; fi
+	if [ $# -gt 3 ]; then echo "Invalid number of arguments was passed" 1>&2; exit 1; fi
+	if [ ! -r $2 ] || [ ! -r $3 ]; then echo "Invalid file was supplied" 1>&2; exit 1; fi
+	if [[ $# == 3 ]] ; then f1=$2; f2=$3; fi
+	add $f1 $f2
+fi
+
+# Condition prechecks for multiply
+if [ $1 = "multiply" ]; then 
+	if [[ $# == 0 ]]; then echo "No arguments will be passed to multiply" 1>&2; exit 1; fi
+	if [ $# -gt 3 ]; then echo "Invalid number of arguments" 1>&2; exit 1; fi
+	if [ ! -r $2 ] || [ ! -r $3 ]; then echo "Invalid file" 1>&2; exit 1; fi
+	if [[ $# == 3 ]] ; then f1=$2; f2=$3; fi
+	multiply $f1 $f2
+fi
+
+# If invalid command is used
+if [[ $1 != "dims" ]] && [[ $1 != "transpose" ]] && [[ $1 != "add" ]] && [[ $1 != "mean" ]] && [[ $1 != "multiply" ]]
+then
+	echo "Invalid number of arguments" 1>&2; exit 1
+fi
+rm -f temp
