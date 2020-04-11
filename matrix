@@ -391,22 +391,14 @@ if [ $1 = "transpose" ]; then
 	transpose $file1
 fi
 
-# Condition prechecks for add
-if [ $1 = "add" ]; then 
-	if [[ $# == 1 ]]; then echo "No arguments will be passed to add" 1>&2; exit 1; fi
-	if [ $# -gt 3 ]; then echo "Invalid number of arguments was passed" 1>&2; exit 1; fi
-	if [ ! -r $2 ] || [ ! -r $3 ]; then echo "Invalid file was supplied" 1>&2; exit 1; fi
-	if [[ $# == 3 ]] ; then f1=$2; f2=$3; fi
-	add $f1 $f2
-fi
-
-# Condition prechecks for multiply
-if [ $1 = "multiply" ]; then 
-	if [[ $# == 0 ]]; then echo "No arguments will be passed to multiply" 1>&2; exit 1; fi
+# Condition prechecks for multiply and add
+if [ $1 = "multiply" ] || [ $1 = "add" ]; then 
+	func=$1
+	if [[ $# == 1 ]]; then echo "No arguments will be passed" 1>&2; exit 1; fi
 	if [ $# -gt 3 ]; then echo "Invalid number of arguments" 1>&2; exit 1; fi
 	if [ ! -r $2 ] || [ ! -r $3 ]; then echo "Invalid file" 1>&2; exit 1; fi
 	if [[ $# == 3 ]] ; then f1=$2; f2=$3; fi
-	multiply $f1 $f2
+	$func $f1 $f2
 fi
 
 # If invalid command is used
