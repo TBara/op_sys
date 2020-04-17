@@ -1,12 +1,12 @@
 Checking for banned tools
 Possible use of banned tools found:
 ----------
-7:# shell scripting: this means that, among others, awk, sed, tcl, bc, perl, 
-8:# & the python languages and tools are off-limits. Use of array is discouraged.
-25:# among others, awk, sed, tcl, bc, perl, & the python languages
-91:# this means that, among others, awk, sed, tcl, bc, perl, & the python languages
-166:# this means that, among others, awk, sed, tcl, bc, perl, & the python languages
-273:# this means that, among others, awk, sed, tcl, bc, perl, & the python languages
+13:# shell scripting: this means that, among others, awk, sed, tcl, bc, perl, 
+14:# & the python languages and tools are off-limits. Use of array is discouraged.
+31:# among others, awk, sed, tcl, bc, perl, & the python languages
+97:# this means that, among others, awk, sed, tcl, bc, perl, & the python languages
+172:# this means that, among others, awk, sed, tcl, bc, perl, & the python languages
+279:# this means that, among others, awk, sed, tcl, bc, perl, & the python languages
 ----------
 ===Rubric 1a=== Dims with 2 arguments should throw error (1pt):
 + Passed!
